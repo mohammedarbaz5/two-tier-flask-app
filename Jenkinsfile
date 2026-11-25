@@ -33,7 +33,12 @@ pipeline{
         stage("Deploy"){
             steps{
                 echo "Docker compose se deploy hogya"
-                sh "docker compose up -d --build flask-app"
+                sh '''
+                    docker rm -f mysql flask-app || true
+                    docker volume rm demo-cicd_mysql-data || true
+                    docker compose up -d --build flask-app
+                    docker update --memory 400m --memory-swap 800m mysql || true
+                '''
             }
         }
     }
